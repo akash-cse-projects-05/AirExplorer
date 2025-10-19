@@ -1,0 +1,181 @@
+<% layout("layouts/boilerplate") %>
+
+<body class="py-5" style="background-color: #f7f7f7;">
+  <div class="container">
+    <div class="p-4 p-md-5 mx-auto bg-white" style="max-width: 800px; border-radius: 12px;">
+      <h2 class="mb-4 text-center fw-bold" style="color: #FF385C;">Edit Listing</h2>
+
+      <form method="POST" action="/listings/<%= listing._id %>?_method=PUT">
+
+        <!-- Title & Price -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <label class="form-label">Title</label>
+            <input type="text" name="listing[title]" value="<%= listing.title %>" class="form-control border rounded-pill px-3 py-2" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Price</label>
+            <input type="number" name="listing[price]" value="<%= listing.price %>" class="form-control border rounded-pill px-3 py-2" required>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+          <label class="form-label">Description</label>
+          <textarea name="listing[description]" class="form-control rounded-4 px-3 py-2" rows="3" required><%= listing.description %></textarea>
+        </div>
+
+        <!-- Category -->
+        <div class="mb-4">
+          <label class="form-label">Category</label>
+          <select name="listing[category]" class="form-select border rounded-pill px-3 py-2" required>
+            <% const categories = ["Trending", "Rooms", "Iconic Cities", "Mountain", "Castles", "Amazing Pool", "Camping", "Farms", "Arctic", "Domes", "Boats"]; %>
+            <% categories.forEach(category => { %>
+              <option value="<%= category %>" <%= listing.category === category ? 'selected' : '' %>><%= category %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <!-- Location, City, Country -->
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <label class="form-label">Location</label>
+            <input type="text" name="listing[location]" value="<%= listing.location %>" class="form-control border rounded-pill px-3 py-2" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">City</label>
+            <input type="text" name="listing[city]" value="<%= listing.city %>" class="form-control border rounded-pill px-3 py-2" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Country</label>
+            <input type="text" name="listing[country]" value="<%= listing.country %>" class="form-control border rounded-pill px-3 py-2" required>
+          </div>
+        </div>
+
+        <!-- Map Section -->
+        <div class="mb-4">
+          <label class="form-label">Update Location on Map</label>
+          <p class="text-muted small mb-2">Click on the map to update the exact location of your listing</p>
+          <div id="edit-map" style="height: 400px; border-radius: 12px; border: 2px solid #ddd;"></div>
+          <div class="row g-2 mt-2">
+            <div class="col-md-6">
+              <label class="form-label small">Latitude</label>
+              <input type="number" class="form-control form-control-sm" name="listing[coordinates][latitude]" id="edit-latitude" step="any" value="<%= listing.coordinates && listing.coordinates.latitude ? listing.coordinates.latitude : '' %>" readonly>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">Longitude</label>
+              <input type="number" class="form-control form-control-sm" name="listing[coordinates][longitude]" id="edit-longitude" step="any" value="<%= listing.coordinates && listing.coordinates.longitude ? listing.coordinates.longitude : '' %>" readonly>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Image -->
+        <div class="mb-4">
+          <label class="form-label">Main Image URL</label>
+          <input type="text" name="listing[image]" value="<%= listing.image %>" class="form-control border rounded-pill px-3 py-2" required>
+        </div>
+
+        <!-- Additional Images -->
+        <div class="mb-4">
+          <label class="form-label">Additional Images</label>
+          <% for (let i = 0; i < 3; i++) { %>
+            <input type="text" name="listing[images]" value="<%= listing.images[i] || '' %>" class="form-control mb-2 border rounded-pill px-3 py-2" placeholder="Image URL <%= i + 1 %>">
+          <% } %>
+        </div>
+
+        <!-- Amenities -->
+        <div class="mb-4">
+          <label class="form-label">Amenities</label>
+          <div class="row">
+            <% const amenities = ["Wi-Fi", "Air Conditioning", "Swimming Pool", "Parking", "Kitchen", "TV", "Washing Machine", "Heating", "Garden", "Balcony", "Gym", "Pets Allowed"]; %>
+            <% amenities.forEach((amenity, index) => { %>
+              <div class="col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="listing[amenities]" value="<%= amenity %>" id="amenity<%= index %>" <%= listing.amenities && listing.amenities.includes(amenity) ? 'checked' : '' %>>
+                  <label class="form-check-label" for="amenity<%= index %>"><%= amenity %></label>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center">
+          <button type="submit" class="btn px-5 py-2" style="background-color: #FF385C; color: white; border-radius: 999px; font-weight: 500;">Update Listing</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Leaflet Map Script for Edit -->
+  <script>
+    // Initialize the edit map
+    let editMap;
+    let editMarker;
+    
+    // Get existing coordinates or use default
+    const existingLat = <%= listing.coordinates && listing.coordinates.latitude ? listing.coordinates.latitude : 28.6139 %>;
+    const existingLng = <%= listing.coordinates && listing.coordinates.longitude ? listing.coordinates.longitude : 77.2090 %>;
+    
+    // Initialize map when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Create map
+      editMap = L.map('edit-map').setView([existingLat, existingLng], 13);
+      
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(editMap);
+      
+      // Add existing marker if coordinates exist
+      if (<%= listing.coordinates && listing.coordinates.latitude ? 'true' : 'false' %>) {
+        editMarker = L.marker([existingLat, existingLng], {draggable: true}).addTo(editMap);
+        
+        // Update coordinates when marker is moved
+        editMarker.on('dragend', function(e) {
+          const position = e.target.getLatLng();
+          updateEditCoordinates(position.lat, position.lng);
+        });
+      } else {
+        // Add a default marker
+        editMarker = L.marker([existingLat, existingLng], {draggable: true}).addTo(editMap);
+        
+        // Update coordinates when marker is moved
+        editMarker.on('dragend', function(e) {
+          const position = e.target.getLatLng();
+          updateEditCoordinates(position.lat, position.lng);
+        });
+      }
+      
+      // Add click event to map
+      editMap.on('click', function(e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        
+        // Remove existing marker
+        if (editMarker) {
+          editMap.removeLayer(editMarker);
+        }
+        
+        // Add new marker at clicked location
+        editMarker = L.marker([lat, lng], {draggable: true}).addTo(editMap);
+        
+        // Update coordinates
+        updateEditCoordinates(lat, lng);
+        
+        // Update marker position on drag
+        editMarker.on('dragend', function(e) {
+          const position = e.target.getLatLng();
+          updateEditCoordinates(position.lat, position.lng);
+        });
+      });
+      
+      // Function to update coordinate inputs
+      function updateEditCoordinates(lat, lng) {
+        document.getElementById('edit-latitude').value = lat.toFixed(6);
+        document.getElementById('edit-longitude').value = lng.toFixed(6);
+      }
+    });
+  </script>
+</body>

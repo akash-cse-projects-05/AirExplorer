@@ -1,0 +1,281 @@
+<% layout("layouts/boilerplate") %>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-6">
+
+        <!-- =================== Dynamic Image Gallery =================== -->
+        <% 
+            const allImages = [];
+            if (listing.image) allImages.push(listing.image);
+            if (listing.images && listing.images.length > 0) {
+                listing.images.forEach(img => {
+                    if (img && img.trim() !== '') allImages.push(img);
+                });
+            }
+            const imageCount = allImages.length;
+        %>
+
+        <% if (imageCount === 1) { %>
+            <!-- ONE IMAGE + MAP SIDE BY SIDE -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <img src="<%= allImages[0] %>" alt="<%= listing.title %>" class="w-full h-[400px] object-cover rounded-xl shadow-md">
+                </div>
+                <div id="listing-map" class="h-[400px] rounded-xl shadow-md"></div>
+            </div>
+
+        <% } else if (imageCount === 3) { %>
+            <!-- THREE IMAGE AIRBNB GRID STYLE -->
+            <div class="grid grid-cols-3 gap-2 mb-8">
+                <div class="col-span-2">
+                    <img src="<%= allImages[0] %>" alt="<%= listing.title %>" class="w-full h-[400px] object-cover rounded-l-xl shadow-md">
+                </div>
+                <div class="flex flex-col gap-2">
+                    <img src="<%= allImages[1] %>" class="w-full h-[198px] object-cover rounded-tr-xl shadow-md">
+                    <img src="<%= allImages[2] %>" class="w-full h-[198px] object-cover rounded-br-xl shadow-md">
+                </div>
+            </div>
+        <% } else if (imageCount === 4) { %>
+            <!-- FOUR IMAGES - AIRBNB STYLE -->
+            <div class="grid grid-cols-4 gap-2 mb-8">
+                <div class="col-span-2">
+                    <img src="<%= allImages[0] %>" alt="<%= listing.title %>" class="w-full h-[400px] object-cover rounded-l-xl shadow-md">
+                </div>
+                <div class="flex flex-col gap-2">
+                    <img src="<%= allImages[1] %>" class="w-full h-[198px] object-cover shadow-md">
+                    <img src="<%= allImages[2] %>" class="w-full h-[198px] object-cover shadow-md">
+                </div>
+                <div class="flex flex-col gap-2">
+                    <img src="<%= allImages[3] %>" class="w-full h-[198px] object-cover rounded-r-xl shadow-md">
+                    <% if (listing.coordinates && listing.coordinates.latitude && listing.coordinates.longitude) { %>
+                        <div id="listing-map" class="h-[198px] rounded-br-xl shadow-md"></div>
+                    <% } else { %>
+                        <div class="h-[198px] bg-gray-200 rounded-br-xl flex items-center justify-center text-gray-500">
+                            No Map Data
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        <% } else { %>
+            <!-- FIVE OR MORE IMAGES - AIRBNB STYLE -->
+            <div class="grid grid-cols-4 gap-2 mb-8">
+                <div class="col-span-2">
+                    <img src="<%= allImages[0] %>" alt="<%= listing.title %>" class="w-full h-[400px] object-cover rounded-l-xl shadow-md">
+                </div>
+                <div class="flex flex-col gap-2">
+                    <img src="<%= allImages[1] %>" class="w-full h-[198px] object-cover shadow-md">
+                    <img src="<%= allImages[2] %>" class="w-full h-[198px] object-cover shadow-md">
+                    </div>
+                <div class="flex flex-col gap-2">
+                    <img src="<%= allImages[3] %>" class="w-full h-[198px] object-cover shadow-md">
+                    <div class="relative h-[198px] rounded-br-xl overflow-hidden">
+                        <% if (imageCount > 4) { %>
+                            <img src="<%= allImages[4] %>" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                <span class="text-white text-2xl font-bold">+<%= imageCount - 4 %></span>
+                        </div>
+                        <% } else { %>
+                            <% if (listing.coordinates && listing.coordinates.latitude && listing.coordinates.longitude) { %>
+                                <div id="listing-map" class="h-full rounded-br-xl shadow-md"></div>
+                            <% } else { %>
+                                <div class="h-full bg-gray-200 rounded-br-xl flex items-center justify-center text-gray-500">
+                                    No Map Data
+                        </div>
+                            <% } %>
+                        <% } %>
+                        </div>
+                    </div>
+                </div>
+            
+            <!-- Map below for 5+ images -->
+            <% if (imageCount > 4 && listing.coordinates && listing.coordinates.latitude && listing.coordinates.longitude) { %>
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Where you'll be</h3>
+                    <div id="listing-map" class="h-[300px] rounded-xl shadow-md"></div>
+                    <p class="text-gray-600 mt-2">
+                        <i class="fas fa-map-marker-alt text-red-500"></i>
+                        <%= listing.location %>, <%= listing.city %>, <%= listing.country %>
+                    </p>
+        </div>
+            <% } %>
+        <% } %>
+
+        <!-- =================== Title + Owner + Description =================== -->
+        <div class="flex flex-wrap -mx-4">
+            <!-- LEFT SIDE -->
+            <div class="w-full lg:w-2/3 px-4 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-3xl font-semibold mb-2"><%= listing.title %></h2>
+
+                    <p class="text-gray-600 mb-4">
+                        <i class="fas fa-map-marker-alt text-red-500"></i>
+                        <%= listing.location %>
+                    </p>
+
+                    <p class="text-lg mb-6 text-gray-800 leading-relaxed"><%= listing.description %></p>
+
+                    <!-- Host info -->
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="bg-gray-200 p-3 rounded-full">
+                            <i class="fas fa-user text-gray-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Hosted by <%= listing.owner?.username || 'Host' %></p>
+                            <p class="text-sm text-gray-500">Joined in 2020</p>
+                        </div>
+                    </div>
+
+                    <!-- Edit/Delete (Owner only) -->
+                    <% if (currentUser && currentUser._id.toString() === listing.owner._id.toString()) { %>
+                        <div class="mb-6 flex space-x-4">
+                            <form action="/listings/<%= listing._id %>/edit" method="GET">
+                                <button class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Edit Listing</button>
+                            </form>
+        <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Are you sure you want to delete this listing?');">
+                                <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Delete</button>
+        </form>
+    </div>
+<% } %>
+
+                    <!-- Amenities -->
+                    <h3 class="text-xl font-semibold mb-3">What this place offers</h3>
+                    <div class="grid grid-cols-2 gap-2 mb-6">
+                        <% if (listing.amenities && listing.amenities.length > 0) { %>
+                            <% listing.amenities.forEach(a => { %>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-check text-green-600"></i>
+                                    <span><%= a %></span>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <p>No amenities listed.</p>
+                        <% } %>
+                    </div>
+
+                    <!-- Reviews -->
+                    <h3 class="text-xl font-semibold mb-3">Guest Reviews</h3>
+                    <% if (listing.reviews && listing.reviews.length > 0) { %>
+                        <% listing.reviews.forEach(r => { %>
+                            <div class="border-b pb-3 mb-3">
+                                <p class="font-semibold"><%= r.author.username %></p>
+                                <p class="text-yellow-500">
+                                    <% for (let i = 1; i <= 5; i++) { %>
+                                        <i class="<%= i <= r.rating ? 'fas' : 'far' %> fa-star"></i>
+                                    <% } %>
+                                </p>
+                                <p class="text-gray-700"><%= r.comment %></p>
+                                <% if (currentUser && r.author && currentUser._id.toString() === r.author._id.toString()) { %>
+                                    <form action="/listings/<%= listing._id %>/reviews/<%= r._id %>?_method=DELETE" method="POST">
+                                        <button class="text-red-500 text-sm mt-2 hover:underline">Delete</button>
+                                    </form>
+                                <% } %>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p>No reviews yet. Be the first to review!</p>
+                    <% } %>
+
+                    <% if (currentUser) { %>
+                        <h4 class="text-lg font-semibold mt-4 mb-2">Leave a Review</h4>
+                        <form action="/listings/<%= listing._id %>/reviews" method="POST">
+                            <div class="rating mb-2">
+                                <% for (let i = 5; i >= 1; i--) { %>
+                                    <input type="radio" id="star<%= i %>" name="review[rating]" value="<%= i %>">
+                                    <label for="star<%= i %>"><i class="fa fa-star"></i></label>
+                                <% } %>
+                            </div>
+                            <textarea name="review[comment]" class="w-full border rounded p-2 mb-2" rows="3" placeholder="Write your review..."></textarea>
+                            <button class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Submit Review</button>
+                        </form>
+                    <% } else { %>
+                        <p class="text-sm mt-2 text-gray-500">Please <a href="/login" class="text-blue-600 underline">log in</a> to leave a review.</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDE: Booking Section -->
+            <div class="w-full lg:w-1/3 px-4 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-md sticky top-10">
+                    <h4 class="text-2xl font-semibold mb-4">Book your stay</h4>
+                    <% if (currentUser && currentUser._id.toString() !== listing.owner._id.toString()) { %>
+                        <form action="/bookings" method="POST">
+                            <input type="hidden" name="user" value="<%= currentUser._id %>">
+                            <input type="hidden" name="listing" value="<%= listing._id %>">
+                            <div class="mb-4">
+                                <label class="block text-lg mb-1">Check-in</label>
+                                <input type="date" name="checkIn" class="w-full border p-2 rounded" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-lg mb-1">Check-out</label>
+                                <input type="date" name="checkOut" class="w-full border p-2 rounded" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-lg mb-1">Guests</label>
+                                <input type="number" name="guestCount" class="w-full border p-2 rounded" min="1" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-lg mb-1">Total Price (₹)</label>
+                                <input type="number" name="totalPrice" value="<%= listing.price %>" class="w-full border p-2 rounded" readonly>
+                            </div>
+                            <button class="bg-red-500 text-white w-full py-2 rounded hover:bg-red-600">Reserve</button>
+                            <p class="text-center text-gray-500 text-sm mt-2">You won't be charged yet</p>
+                        </form>
+                    <% } else if (!currentUser) { %>
+                        <p class="text-gray-600">Please <a href="/login" class="text-blue-600 underline">log in</a> to book.</p>
+                    <% } else { %>
+            <p class="text-gray-600">You are the owner of this listing.</p>
+<% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================== MAP BELOW FOR MULTI-IMAGE CASE =================== -->
+        <% if (listing.coordinates && listing.coordinates.latitude && listing.coordinates.longitude) { %>
+            <div class="mt-10">
+                <h3 class="text-xl font-semibold mb-3">Where you'll be</h3>
+                <div id="listing-map-below" class="w-full h-[400px] rounded-lg shadow-md"></div>
+                            </div>
+                            <% } %>
+                </div>
+                
+    <!-- =================== Leaflet Map Script =================== -->
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        <% if (listing.coordinates && listing.coordinates.latitude && listing.coordinates.longitude) { %>
+            const mapElement = document.getElementById('listing-map') || document.getElementById('listing-map-below');
+            if (mapElement) {
+                const map = L.map(mapElement, { scrollWheelZoom: false })
+                    .setView([<%= listing.coordinates.latitude %>, <%= listing.coordinates.longitude %>], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                L.marker([<%= listing.coordinates.latitude %>, <%= listing.coordinates.longitude %>])
+                    .addTo(map)
+                    .bindPopup("<b><%= listing.title %></b><br><%= listing.location %>");
+            }
+        <% } %>
+    });
+    </script>
+
+    <!-- =================== Rating Style =================== -->
+    <style>
+        .rating {
+            display: inline-flex;
+            flex-direction: row-reverse;
+        }
+        .rating input {
+            display: none;
+        }
+        .rating label {
+            font-size: 1.5em;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .rating label:hover,
+        .rating label:hover ~ label,
+        .rating input:checked ~ label {
+            color: #FFD700;
+        }
+    </style>
+</body>

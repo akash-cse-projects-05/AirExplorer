@@ -1,0 +1,531 @@
+<% layout("layouts/boilerplate") %>
+
+<!-- Professional Airbnb-style Success Page -->
+<style>
+  .success-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: Circular, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  }
+
+  .success-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 40px 20px;
+    background-color: #f7f7f7;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  }
+
+  .success-icon {
+    margin: 0 auto 20px;
+    width: 64px;
+    height: 64px;
+  }
+
+  .success-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #222222;
+  }
+
+  .success-subtitle {
+    font-size: 18px;
+    color: #717171;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .success-content {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+
+  .property-card {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #ebebeb;
+  }
+
+  @media (min-width: 768px) {
+    .property-card {
+      flex-direction: row;
+    }
+  }
+
+  .property-image {
+    position: relative;
+    width: 100%;
+    height: 250px;
+  }
+
+  @media (min-width: 768px) {
+    .property-image {
+      width: 40%;
+      height: auto;
+    }
+  }
+
+  .property-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .property-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background-color: #00A699;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+</style>
+
+<div class="success-container">
+  <!-- Header Section -->
+  <div class="success-header">
+    <div class="success-icon">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="32" r="32" fill="#FF385C"/>
+        <path d="M44 24L28 40L20 32" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1 class="success-title">Your reservation is confirmed!</h1>
+    <p class="success-subtitle">We can't wait to host you. Here's what you need to know about your upcoming trip.</p>
+  </div>
+
+  <!-- Main Content -->
+  <div class="success-content">
+    <!-- Property Card -->
+    <div class="property-card">
+      <div class="property-image">
+        <img src="<%= booking.listing.image %>" alt="<%= booking.listing.title %>">
+        <div class="property-badge">Confirmed</div>
+      </div>
+
+      <div class="property-details" style="padding: 24px; flex: 1;">
+        <div class="property-info" style="margin-bottom: 24px;">
+          <h2 class="property-title" style="font-size: 24px; font-weight: 600; margin-bottom: 8px;"><%= booking.listing.title %></h2>
+          <div class="property-location" style="display: flex; align-items: center; color: #717171;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right: 8px;">
+              <path d="M8 0C3.6 0 0 3.6 0 8s8 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 11c-1.7 0-3-1.3-3-3s1.3-3 3-3 3 1.3 3 3-1.3 3-3 3z" fill="#717171"/>
+            </svg>
+            <%= booking.listing.location %>
+          </div>
+        </div>
+
+        <!-- Trip Details -->
+        <div class="trip-details">
+          <div class="detail-section" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #ebebeb;">
+            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Your trip</h3>
+            <div class="detail-row" style="display: flex; flex-wrap: wrap;">
+              <div class="detail-item" style="margin-right: 24px; margin-bottom: 16px;">
+                <div class="detail-label" style="font-weight: 600; margin-bottom: 4px;">Dates</div>
+                <div class="detail-value">
+                  <%= new Date(booking.checkIn).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %> – 
+                  <%= new Date(booking.checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                </div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label" style="font-weight: 600; margin-bottom: 4px;">Guests</div>
+                <div class="detail-value"><%= booking.guestCount %> guest<%= booking.guestCount > 1 ? 's' : '' %></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #ebebeb;">
+            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Price details</h3>
+            <div class="price-breakdown">
+              <div class="price-row" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <% const nights = Math.ceil((new Date(booking.checkOut) - new Date(booking.checkIn)) / (1000 * 60 * 60 * 24)); %>
+                <span>₹<%= booking.listing.price %> × <%= nights %> night<%= nights > 1 ? 's' : '' %></span>
+                <span>₹<%= booking.listing.price * nights %></span>
+              </div>
+              <div class="price-row" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <span>Cleaning fee</span>
+                <span>₹0</span>
+              </div>
+              <div class="price-row" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <span>Service fee</span>
+                <span>₹0</span>
+              </div>
+              <div class="price-row total" style="display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 1px solid #ebebeb; font-weight: 600;">
+                <span>Total (₹)</span>
+                <span>₹<%= booking.totalPrice %></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <div class="booking-id" style="background-color: #f7f7f7; padding: 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <span class="booking-label" style="font-weight: 600;">Confirmation code</span>
+              <span class="booking-code" style="font-family: monospace; font-size: 16px; font-weight: 600;"><%= booking._id.toString().slice(-8).toUpperCase() %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons" style="display: flex; justify-content: space-between; padding: 24px;">
+      <a href="/listings" class="btn-primary" style="display: inline-flex; align-items: center; background-color: #FF385C; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-right: 8px;">
+          <path d="M15.833 10H4.167M10 4.167L4.167 10l5.833 5.833" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to search
+      </a>
+      <a href="/users/profile" class="btn-secondary" style="display: inline-flex; align-items: center; background-color: white; color: #222; border: 1px solid #ddd; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-right: 8px;">
+          <path d="M10 9C12.2091 9 14 7.20914 14 5C14 2.79086 12.2091 1 10 1C7.79086 1 6 2.79086 6 5C6 7.20914 7.79086 9 10 9Z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M3 19C3 14.5817 6.13401 11 10 11C13.866 11 17 14.5817 17 19" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        View my trips
+      </a>
+    </div>
+
+    <!-- Help Section -->
+    <div class="help-section">
+      <h3>Need help?</h3>
+      <p>Contact your host or get help with a few common issues.</p>
+      <div class="help-links">
+        <a href="#">Contact host</a>
+        <a href="#">Reschedule trip</a>
+        <a href="#">Cancel reservation</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Professional Airbnb-style CSS -->
+<style>
+  /* Reset and Base Styles */
+  .success-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.5;
+    color: #222222;
+  }
+
+  /* Header Section */
+  .success-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .success-icon {
+    margin-bottom: 24px;
+    animation: checkmark 0.6s ease-in-out;
+  }
+
+  @keyframes checkmark {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  .success-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: #222222;
+    margin: 0 0 16px 0;
+    line-height: 1.2;
+  }
+
+  .success-subtitle {
+    font-size: 16px;
+    color: #717171;
+    margin: 0;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Property Card */
+  .property-card {
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 32px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .property-image {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+  }
+
+  .property-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .property-card:hover .property-image img {
+    transform: scale(1.05);
+  }
+
+  .property-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: #FF385C;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .property-details {
+    padding: 24px;
+  }
+
+  .property-info {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #dddddd;
+  }
+
+  .property-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #222222;
+    margin: 0 0 8px 0;
+  }
+
+  .property-location {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #717171;
+    font-size: 14px;
+  }
+
+  /* Trip Details */
+  .trip-details {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .detail-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #222222;
+    margin: 0 0 16px 0;
+  }
+
+  .detail-row {
+    display: flex;
+    gap: 32px;
+  }
+
+  .detail-item {
+    flex: 1;
+  }
+
+  .detail-label {
+    font-size: 14px;
+    color: #717171;
+    margin-bottom: 4px;
+  }
+
+  .detail-value {
+    font-size: 16px;
+    color: #222222;
+    font-weight: 500;
+  }
+
+  /* Price Breakdown */
+  .price-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+  }
+
+  .price-row.total {
+    border-top: 1px solid #dddddd;
+    padding-top: 16px;
+    margin-top: 8px;
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  /* Booking ID */
+  .booking-id {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #f7f7f7;
+    border-radius: 8px;
+  }
+
+  .booking-label {
+    font-size: 14px;
+    color: #717171;
+  }
+
+  .booking-code {
+    font-size: 16px;
+    font-weight: 600;
+    color: #222222;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    letter-spacing: 1px;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .btn-primary, .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+
+  .btn-primary {
+    background: #FF385C;
+    color: white;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .btn-primary:hover {
+    background: #E31C5F;
+    color: white;
+    text-decoration: none;
+  }
+
+  .btn-secondary {
+    background: white;
+    color: #222222;
+    border-color: #dddddd;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .btn-secondary:hover {
+    background: #f7f7f7;
+    color: #222222;
+    text-decoration: none;
+  }
+
+  /* Help Section */
+  .help-section {
+    background: #f7f7f7;
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .help-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #222222;
+    margin: 0 0 8px 0;
+  }
+
+  .help-section p {
+    color: #717171;
+    margin: 0 0 20px 0;
+    font-size: 14px;
+  }
+
+  .help-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .help-links a {
+    color: #222222;
+    text-decoration: underline;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .help-links a:hover {
+    color: #FF385C;
+    text-decoration: none;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .success-container {
+      padding: 24px 16px;
+    }
+
+    .success-title {
+      font-size: 28px;
+    }
+
+    .success-subtitle {
+      font-size: 14px;
+    }
+
+    .property-image {
+      height: 250px;
+    }
+
+    .property-details {
+      padding: 20px;
+    }
+
+    .detail-row {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .help-links {
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+
+  /* Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .success-icon {
+      animation: none;
+    }
+    
+    .property-image img {
+      transition: none;
+    }
+  }
+</style>

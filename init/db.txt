@@ -1,0 +1,38 @@
+// const mongoose = require("mongoose");
+// const initData = require("./data"); // Your data file
+// const Listing = require("../models/listing"); // Your Mongoose model for Listing
+
+// // MongoDB connection URL
+// const MONGO_URL = "mongodb://127.0.0.1:27017/WANDERER";
+
+// // Connect to MongoDB
+// async function main() {
+//     await mongoose.connect(MONGO_URL);
+//     console.log("Connected to the DB");
+// }
+
+// // Initialize the database
+// const initDB = async () => {
+//     try {
+//         // Delete all existing data
+//         await Listing.deleteMany({});
+//         console.log("Existing data cleared.");
+
+//         // Update data with the correct owner ObjectId
+//         initData.data = initData.data.map((obj) => ({
+//             ...obj,
+//             owner: new mongoose.Types.ObjectId("6742dcc8d91ab24a6a0f7eb0"), // Convert owner to ObjectId
+//         }));
+
+//         // Insert updated data into the database
+//         await Listing.insertMany(initData.data);
+//         console.log("The data was initialized.");
+//     } catch (err) {
+//         console.error("Error initializing the database:", err);
+//     }
+// };
+
+// // Run the script
+// main()
+//     .then(() => initDB())
+//     .catch((err) => console.error("Connection failed:", err));

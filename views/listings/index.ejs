@@ -1,0 +1,178 @@
+<% layout("layouts/boilerplate") %>
+<!-- success -->
+
+
+<div class="container-filter">
+    <div id="filters" class="d-flex justify-content-center">
+        <div class="filter mx-2" data-filter="trending">
+            <div><i class="fa-solid fa-fire"></i></div>
+            <p>Trending</p>
+        </div>
+        <div class="filter mx-2" data-filter="rooms">
+            <div><i class="fa-solid fa-bed"></i></div>
+            <p>Rooms</p>
+        </div>
+        <div class="filter mx-2" data-filter="cities">
+            <div><i class="fa-solid fa-mountain-city"></i></div>
+            <p>Iconic Cities</p>
+        </div>
+        <div class="filter mx-2" data-filter="mountain">
+            <div><i class="fa-solid fa-mountain"></i></div>
+            <p>Mountain</p>
+        </div>
+        <div class="filter mx-2" data-filter="castles">
+            <div><i class="fa-brands fa-fort-awesome"></i></div>
+            <p>Castles</p>
+        </div>
+        <div class="filter mx-2" data-filter="pool">
+            <div><i class="fa-solid fa-person-swimming"></i></div>
+            <p>Amazing Pool</p>
+        </div>
+        <div class="filter mx-2" data-filter="camping">
+            <div><i class="fa-solid fa-campground"></i></div>
+            <p>Camping</p>
+        </div>
+        <div class="filter mx-2" data-filter="farms">
+            <div><i class="fa-solid fa-cow"></i></div>
+            <p>Farms</p>
+        </div>
+        <div class="filter mx-2" data-filter="arctic">
+            <div><i class="fa-solid fa-snowflake"></i></div>
+            <p>Arctic</p>
+        </div>
+        <div class="filter mx-2" data-filter="domes">
+            <div><i class="fa-solid fa-igloo"></i></div>
+            <p>Domes</p>
+        </div>
+        <div class="filter mx-2" data-filter="boats">
+            <div><i class="fa-solid fa-ship"></i></div>
+            <p>Boats</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row" id="listing-container">
+        <% for (let listing of allListings) { %>
+            <div class="col-md-3 mb-4 listing-item" data-category="<%= listing.category %>">
+                <a href="/listings/<%= listing._id %>" style="text-decoration: none;">
+                    <div class="card" style="width: 100%; height: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 10px; transition: transform 0.2s ease-in-out;">
+                        <img src="<%= listing.image %>" class="card-img-top" alt="<%= listing.title %>" style="object-fit: cover; height: 250px; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-size: 1.1rem; font-weight: bold; color: #333;"><%= listing.title %></h5>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="price" style="font-weight: light; color: #2d2d2d;"> Price:&#8377 <%= listing.price %></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const filterButtons = document.querySelectorAll('.filter');
+    const listingItems = document.querySelectorAll('.listing-item');
+
+    filterButtons.forEach(function (filter) {
+        filter.addEventListener('click', function () {
+            const filterCategory = this.getAttribute('data-filter');
+
+            listingItems.forEach(function (listing) {
+                const category = listing.getAttribute('data-category');
+
+                if (filterCategory === 'all' || category === filterCategory) {
+                    listing.style.display = 'block';
+                } else {
+                    listing.style.display = 'none';
+                }
+            });
+
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+});
+</script>
+
+<style>
+    .filter.active {
+        border-bottom: 2px solid #e84b17;
+        padding-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .container-filter {
+        width: 100%;
+    }
+
+    #filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .filter {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .filter i {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .filter p {
+        margin: 0;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .card {
+        width: 100%;
+        height: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        transition: transform 0.2s ease-in-out;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+    .card-img-top {
+        object-fit: cover;
+        height: 250px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .price {
+        font-weight: light;
+        color: #2d2d2d;
+    }
+
+    .card:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+</style>

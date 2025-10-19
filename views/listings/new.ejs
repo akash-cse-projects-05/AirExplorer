@@ -1,0 +1,243 @@
+<% layout("layouts/boilerplate") %>
+
+<style>
+  .airbnb-container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .form-section-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #222;
+  }
+
+  label.form-label {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .form-control, .form-select {
+    border-radius: 12px;
+    padding: 10px 15px;
+  }
+
+  .form-check-input {
+    margin-top: 0.35em;
+  }
+
+  .submit-btn {
+    background-color: #FF385C;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 40px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+
+  .submit-btn:hover {
+    background-color: #e72e4f;
+  }
+</style>
+
+<body class="bg-light py-5">
+
+  <div class="airbnb-container">
+    <h2 class="text-center mb-4 fw-bold" style="color: #FF385C;">Create a New Listing</h2>
+
+    <form method="POST" action="/listings" class="needs-validation" novalidate>
+
+      <!-- Title and Price -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Title</label>
+          <input class="form-control" name="listing[title]" type="text" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Price (per night)</label>
+          <input class="form-control" name="listing[price]" type="number" required>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" name="listing[description]" rows="3" required></textarea>
+      </div>
+      <div class="mb-3">
+    <label class="form-label">Status</label>
+    <select class="form-control" name="listing[status]" required>
+        <option value="open">Open</option>
+        <option value="closed">Closed</option>
+    </select>
+</div>
+
+      <!-- Category -->
+      <div class="mb-3">
+        <label class="form-label">Category</label>
+        <select class="form-select" name="listing[category]" required>
+          <option value="" disabled selected>Select a category</option>
+          <option value="Trending">Trending</option>
+          <option value="Rooms">Rooms</option>
+          <option value="Iconic Cities">Iconic Cities</option>
+          <option value="Mountain">Mountain</option>
+          <option value="Castles">Castles</option>
+          <option value="Amazing Pool">Amazing Pool</option>
+          <option value="Camping">Camping</option>
+          <option value="Farms">Farms</option>
+          <option value="Arctic">Arctic</option>
+          <option value="Domes">Domes</option>
+          <option value="Boats">Boats</option>
+        </select>
+      </div>
+
+      <!-- Location -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">City</label>
+          <input class="form-control" name="listing[city]" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Country</label>
+          <input class="form-control" name="listing[country]" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Exact Location</label>
+          <input class="form-control" name="listing[location]" required>
+        </div>
+      </div>
+
+      <!-- Map Section -->
+      <div class="mb-4">
+        <label class="form-label">Select Location on Map</label>
+        <p class="text-muted small mb-2">Click on the map to set the exact location of your listing</p>
+        <div id="map" style="height: 400px; border-radius: 12px; border: 2px solid #ddd;"></div>
+        <div class="row g-2 mt-2">
+          <div class="col-md-6">
+            <label class="form-label small">Latitude</label>
+            <input type="number" class="form-control form-control-sm" name="listing[coordinates][latitude]" id="latitude" step="any" readonly>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small">Longitude</label>
+            <input type="number" class="form-control form-control-sm" name="listing[coordinates][longitude]" id="longitude" step="any" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Image -->
+      <div class="mb-3">
+        <label class="form-label">Main Image URL</label>
+        <input class="form-control" name="listing[image]" type="text" required>
+      </div>
+
+      <!-- Additional Images -->
+   
+
+      <!-- Amenities -->
+      <div class="mb-4">
+        <label class="form-label">Amenities</label>
+        <div class="row">
+          <% const amenities = ["Wi-Fi", "Air Conditioning", "Swimming Pool", "Parking", "Kitchen", "TV", "Washing Machine", "Heating", "Garden", "Balcony", "Gym", "Pets Allowed"]; %>
+          <% amenities.forEach((amenity, i) => { %>
+            <div class="form-check col-md-4 mb-2">
+              <input class="form-check-input" type="checkbox" name="listing[amenities]" value="<%= amenity %>" id="amenity<%= i %>">
+              <label class="form-check-label" for="amenity<%= i %>"><%= amenity %></label>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="text-center">
+        <button class="submit-btn" type="submit">Create Listing</button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Leaflet Map Script -->
+  <script>
+    // Initialize the map
+    let map;
+    let marker;
+    
+    // Default center (you can change this to your preferred default location)
+    const defaultLat = 28.6139; // Delhi, India
+    const defaultLng = 77.2090;
+    
+    // Initialize map when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Create map
+      map = L.map('map').setView([defaultLat, defaultLng], 10);
+      
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+      
+      // Add a default marker
+      marker = L.marker([defaultLat, defaultLng]).addTo(map);
+      
+      // Update coordinates when marker is moved
+      marker.on('dragend', function(e) {
+        const position = e.target.getLatLng();
+        updateCoordinates(position.lat, position.lng);
+      });
+      
+      // Add click event to map
+      map.on('click', function(e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        
+        // Remove existing marker
+        if (marker) {
+          map.removeLayer(marker);
+        }
+        
+        // Add new marker at clicked location
+        marker = L.marker([lat, lng], {draggable: true}).addTo(map);
+        
+        // Update coordinates
+        updateCoordinates(lat, lng);
+        
+        // Update marker position on drag
+        marker.on('dragend', function(e) {
+          const position = e.target.getLatLng();
+          updateCoordinates(position.lat, position.lng);
+        });
+      });
+      
+      // Function to update coordinate inputs
+      function updateCoordinates(lat, lng) {
+        document.getElementById('latitude').value = lat.toFixed(6);
+        document.getElementById('longitude').value = lng.toFixed(6);
+      }
+      
+      // Function to search for location (optional enhancement)
+      function searchLocation(query) {
+        // You can integrate with a geocoding service here
+        // For now, we'll use a simple approach
+        console.log('Searching for:', query);
+      }
+      
+      // Add search functionality (optional)
+      const locationInput = document.querySelector('input[name="listing[location]"]');
+      if (locationInput) {
+        locationInput.addEventListener('blur', function() {
+          const location = this.value;
+          if (location) {
+            // You can add geocoding here to automatically set coordinates
+            console.log('Location entered:', location);
+          }
+        });
+      }
+    });
+  </script>
+</body>

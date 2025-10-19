@@ -1,0 +1,439 @@
+<% layout("layouts/boilerplate") %>
+
+<!-- ================== Airbnb Professional Profile ================== -->
+<style>
+  :root {
+    --airbnb-pink: #FF385C;
+    --airbnb-dark: #222222;
+    --airbnb-gray: #717171;
+    --airbnb-light: #f7f7f7;
+  }
+
+  .profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    font-family: Circular, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--airbnb-dark);
+  }
+
+  /* ================= Header ================= */
+  .profile-header {
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 80px 0 60px 0;
+    background: linear-gradient(135deg, #FF385C, #E31C5F);
+    border-radius: 20px;
+    color: white;
+    box-shadow: 0 8px 22px rgba(255, 56, 92, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('https://a0.muscache.com/im/pictures/user/User-369819648/original/a1d2e8b4-a3b0-4c1c-9f9c-b1e12c8a7a1d.jpeg?im_w=240') center/cover;
+    opacity: 0.05;
+  }
+
+  /* ================= Avatar ================= */
+  .profile-avatar-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    padding: 4px;
+    background: linear-gradient(135deg, #FF385C, #E31C5F);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+  }
+
+  .profile-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .profile-avatar:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+  }
+
+  .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .edit-avatar-btn {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: rgba(255,255,255,0.85);
+    color: var(--airbnb-dark);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+
+  .edit-avatar-btn:hover {
+    background: var(--airbnb-pink);
+    color: #fff;
+    transform: scale(1.1);
+  }
+
+  .profile-title {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .profile-subtitle {
+    font-size: 18px;
+    opacity: 0.9;
+  }
+
+  /* ================= Tabs ================= */
+  .profile-nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 6px;
+    margin-bottom: 48px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+  }
+
+  .nav-tab {
+    padding: 14px 32px;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--airbnb-gray);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .nav-tab.active {
+    color: var(--airbnb-pink);
+    background-color: rgba(255, 56, 92, 0.08);
+    box-shadow: inset 0 -3px 0 var(--airbnb-pink);
+  }
+
+  /* ================= Sections ================= */
+  .content-section {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    padding: 32px;
+    margin-bottom: 60px;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--airbnb-dark);
+    position: relative;
+  }
+
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--airbnb-pink);
+    border-radius: 3px;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 28px;
+  }
+
+  .property-card {
+    border: 1px solid #eee;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  .property-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+
+  .property-image {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .property-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .property-card:hover img {
+    transform: scale(1.05);
+  }
+
+  .property-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--airbnb-pink);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
+
+  .property-content {
+    padding: 20px;
+  }
+
+  .property-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .property-location {
+    color: var(--airbnb-gray);
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .property-price {
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .booking-details {
+    background: #f8f8f8;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .booking-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .btn-primary, .btn-secondary {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background: var(--airbnb-pink);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #E31C5F;
+  }
+
+  .btn-secondary {
+    background: #fff;
+    border: 1px solid #ddd;
+    color: var(--airbnb-dark);
+  }
+
+  .btn-secondary:hover {
+    background: var(--airbnb-light);
+  }
+
+  .booking-count {
+    display: inline-block;
+    background: rgba(255, 56, 92, 0.1);
+    color: var(--airbnb-pink);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 64px 24px;
+    border: 2px dashed #eee;
+    border-radius: 16px;
+    background: #fcfcfc;
+  }
+
+  .empty-state-icon {
+    font-size: 42px;
+    margin-bottom: 16px;
+  }
+
+  .empty-state-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .empty-state-text {
+    color: var(--airbnb-gray);
+    margin-bottom: 18px;
+  }
+</style>
+
+<!-- ================== Profile Content ================== -->
+<div class="profile-container">
+  <!-- Header -->
+  <div class="profile-header">
+    <div class="profile-avatar-wrapper">
+      <div class="profile-avatar">
+        <% if (currentUser.avatar) { %>
+          <img src="<%= currentUser.avatar %>" alt="Profile Picture">
+        <% } else { %>
+          <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Default Avatar">
+        <% } %>
+        <a href="/profile/edit" class="edit-avatar-btn">✎</a>
+      </div>
+    </div>
+    <h1 class="profile-title">Hi, <%= currentUser.username %> </h1>
+    <p class="profile-subtitle">Welcome back to your Airbnb dashboard</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="profile-nav">
+    <button class="nav-tab active" onclick="showSection('bookings', event)">Your Trips</button>
+    <button class="nav-tab" onclick="showSection('listings', event)">Your Listings</button>
+  </div>
+
+  <!-- ================== Bookings ================== -->
+  <div id="bookings-section" class="content-section">
+    <div class="section-header">
+      <h2 class="section-title">Your Trips</h2>
+    </div>
+
+    <% if (groupedBookings && Object.keys(groupedBookings).length > 0) { %>
+      <div class="cards-grid">
+        <% Object.values(groupedBookings).forEach(group => { %>
+          <div class="property-card">
+            <div class="property-image">
+              <img src="<%= group.listing.image %>" alt="<%= group.listing.title %>">
+              <div class="property-badge">Booked</div>
+            </div>
+            <div class="property-content">
+              <h3 class="property-title"><%= group.listing.title %></h3>
+              <div class="property-location"><%= group.listing.location %></div>
+              <div class="property-price">₹<%= group.listing.price %>/night</div>
+
+              <div class="booking-details">
+                <% group.bookings.forEach(b => { %>
+                  <div class="booking-detail"><span>Check-in</span><span><%= new Date(b.checkIn).toLocaleDateString() %></span></div>
+                  <div class="booking-detail"><span>Check-out</span><span><%= new Date(b.checkOut).toLocaleDateString() %></span></div>
+                  <div class="booking-detail"><span>Guests</span><span><%= b.guestCount %></span></div>
+                <% }) %>
+              </div>
+              <a href="/listings/<%= group.listing._id %>" class="btn-primary">View Listing</a>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <div class="empty-state-icon">✈️</div>
+        <h3 class="empty-state-title">No trips yet</h3>
+        <p class="empty-state-text">When you’re ready to plan your next adventure, we’ll be here to help.</p>
+        <a href="/listings" class="btn-primary">Start Exploring</a>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- ================== Listings ================== -->
+  <div id="listings-section" class="content-section" style="display:none;">
+    <div class="section-header">
+      <h2 class="section-title">Your Listings</h2>
+      <a href="/listings/new" class="btn-primary">+ Add New Listing</a>
+    </div>
+
+    <% if (userListings && userListings.length > 0) { %>
+      <div class="cards-grid">
+        <% userListings.forEach(listing => { %>
+          <div class="property-card">
+            <div class="property-image">
+              <img src="<%= listing.image %>" alt="<%= listing.title %>">
+              <div class="property-badge">Your Listing</div>
+            </div>
+            <div class="property-content">
+              <h3 class="property-title"><%= listing.title %></h3>
+              <div class="property-location"><%= listing.location %></div>
+              <div class="property-price">₹<%= listing.price %>/night</div>
+
+              <% if (listing.bookingCount && listing.bookingCount > 0) { %>
+                <div class="booking-count"><%= listing.bookingCount %> Booking<%= listing.bookingCount > 1 ? 's' : '' %></div>
+              <% } else { %>
+                <div class="booking-count" style="opacity: 0.7;">No bookings yet</div>
+              <% } %>
+
+              <div class="action-buttons">
+                <a href="/listings/<%= listing._id %>" class="btn-primary">View</a>
+                <a href="/listings/<%= listing._id %>/edit" class="btn-secondary">Edit</a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <div class="empty-state-icon">🏠</div>
+        <h3 class="empty-state-title">No listings yet</h3>
+        <p class="empty-state-text">Share your space with travelers and start earning income.</p>
+        <a href="/listings/new" class="btn-primary">Create Listing</a>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  function showSection(section, event) {
+    document.getElementById('bookings-section').style.display = 'none';
+    document.getElementById('listings-section').style.display = 'none';
+    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+    document.getElementById(section + '-section').style.display = 'block';
+    event.target.classList.add('active');
+  }
+</script>
